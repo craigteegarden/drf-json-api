@@ -20,4 +20,4 @@ def test_snakecase():
 
 def test_model_to_resource_type():
     assert model_to_resource_type(Person) == 'people'
-    assert model_to_resource_type(ProfileImage) == 'profile images'
+    assert model_to_resource_type(ProfileImage) == 'profile_images'
