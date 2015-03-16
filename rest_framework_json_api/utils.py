@@ -59,7 +59,7 @@ def model_to_resource_type(model):
     if model is None:
         return "data"
 
-    return force_text(model._meta.verbose_name_plural)
+    return snakecase(force_text(model._meta.verbose_name_plural))
 
 #
 # String conversion
