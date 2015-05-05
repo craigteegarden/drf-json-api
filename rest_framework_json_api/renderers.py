@@ -1,3 +1,4 @@
+import collections
 from rest_framework import relations, renderers, serializers, status
 from rest_framework.settings import api_settings
 from rest_framework_json_api import encoders
@@ -9,7 +10,6 @@ from django.core import urlresolvers
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.utils import encoding, six
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
-
 
 class WrapperNotApplicable(ValueError):
 
@@ -507,8 +507,15 @@ class JsonApiMixin(object):
             }
 
             if is_related_many(field):
-                link_data = [
-                    encoding.force_text(pk) for pk in resource[field_name]]
+                queryset = related_field.get_queryset()
+                if model and isinstance(queryset, collections.Iterable):
+                    link_data = []
+                    for pk in resource[field_name]:
+                        if model.objects.get(pk=pk) in queryset:
+                            link_data.append(encoding.force_text(pk))
+                else:
+                    link_data = [
+                        encoding.force_text(pk) for pk in resource[field_name]]
             elif resource[field_name]:
                 link_data = encoding.force_text(resource[field_name])
             else:
