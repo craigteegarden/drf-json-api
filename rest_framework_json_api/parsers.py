@@ -77,6 +77,8 @@ class JsonApiMixin(object):
                     resource[field_name] = url
             elif isinstance(links[field_name], dict) and 'id' in links[field_name]:
                 resource[field_name] = links[field_name].get('id')
+            elif isinstance(links[field_name], dict) and 'ids' in links[field_name]:
+                resource[field_name] = links[field_name].get('ids')
             else:
                 resource[field_name] = links[field_name]
 
