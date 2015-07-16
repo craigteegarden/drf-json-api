@@ -3,7 +3,7 @@ from rest_framework.settings import api_settings
 from rest_framework_json_api import encoders
 from rest_framework_json_api.utils import (
     get_related_field, is_related_many,
-    model_from_obj, model_to_resource_type
+    model_from_obj, model_to_resource_type, get_resource_type
 )
 from django.core import urlresolvers
 from django.core.exceptions import NON_FIELD_ERRORS
@@ -267,7 +267,11 @@ class JsonApiMixin(object):
 
         view = renderer_context.get("view", None)
         model = self.model_from_obj(view)
-        resource_type = self.model_to_resource_type(model)
+        # resource_type = self.model_to_resource_type(model)
+        serializer = getattr(view, 'serializer_class', None)
+        resource_type = get_resource_type(serializer=serializer,
+                                          view=view,
+                                          model=model)
 
         try:
             from rest_framework.utils.serializer_helpers import ReturnList
@@ -310,7 +314,11 @@ class JsonApiMixin(object):
         request = renderer_context.get("request", None)
 
         model = self.model_from_obj(view)
-        resource_type = self.model_to_resource_type(model)
+        # resource_type = self.model_to_resource_type(model)
+        serializer = getattr(view, 'serializer_class', None)
+        resource_type = get_resource_type(serializer=serializer,
+                                          view=view,
+                                          model=model)
 
         if isinstance(data, list):
             many = True
@@ -440,7 +448,10 @@ class JsonApiMixin(object):
         else:
             model = serializer_field.Meta.model
 
-        resource_type = self.model_to_resource_type(model)
+        # resource_type = self.model_to_resource_type(model)
+        resource_type = get_resource_type(serializer=serializer_field,
+                                          view=None,
+                                          model=model)
 
         linked_ids = self.dict_class()
         links = self.dict_class()
@@ -499,7 +510,11 @@ class JsonApiMixin(object):
         related_field = get_related_field(field)
 
         model = self.model_from_obj(related_field)
-        resource_type = self.model_to_resource_type(model)
+        # resource_type = self.model_to_resource_type(model)
+        # TODO: figure out what serializer this uses
+        resource_type = get_resource_type(serializer=None,
+                                          view=None,
+                                          model=model)
 
         if field_name in resource:
             links[field_name] = {

@@ -49,7 +49,7 @@ def model_from_obj(obj):
     return None
 
 
-def model_to_resource_type(model):
+def model_to_resource_type(model, view=None):
     '''Return the verbose plural form of a model name, with underscores
 
     Examples:
@@ -60,6 +60,27 @@ def model_to_resource_type(model):
         return "data"
 
     return snakecase(force_text(model._meta.verbose_name_plural))
+
+
+def get_resource_type(serializer=None, view=None, model=None):
+    """
+    Try to get the resource type.
+
+    - try retrieving it from the serializer meta
+    - if that doesn't exist, try to get it from the view
+    - if that doesn't work, try to get it from the model
+    """
+    serializer_meta = getattr(serializer, 'Meta', None)
+    if serializer_meta:
+        resource_type = getattr(serializer_meta, 'resource_type', None) if serializer else None
+        if resource_type:
+            return resource_type
+
+    resource_type = getattr(view, 'resource_type', None) if view else None
+    if resource_type:
+        return resource_type
+
+    return model_to_resource_type(model)
 
 #
 # String conversion
