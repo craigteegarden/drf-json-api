@@ -1,7 +1,7 @@
 from rest_framework import parsers, relations
 from rest_framework_json_api.utils import (
     get_related_field, is_related_many,
-    model_from_obj, model_to_resource_type
+    model_from_obj, model_to_resource_type, get_resource_type
 )
 from django.utils import six
 
@@ -16,7 +16,11 @@ class JsonApiMixin(object):
         view = parser_context.get("view", None)
 
         model = self.model_from_obj(view)
-        resource_type = self.model_to_resource_type(model)
+        # resource_type = self.model_to_resource_type(model)
+        serializer = getattr(view, 'serializer_class', None)
+        resource_type = get_resource_type(serializer=serializer,
+                                          view=view,
+                                          model=model)
 
         resource = {}
 
